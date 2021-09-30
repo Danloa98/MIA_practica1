@@ -9,3 +9,11 @@ con=psycopg2.connect(
     user="practica1",
     password="practica1")
 
+
+cur = con.cursor()
+
+# Execute a query
+cur.execute("select * from TEMPORAL;")
+rows=cur.fetchall()
+
+

@@ -370,6 +370,74 @@ select distinct
 
 ----------------TABLA CLIENTE------------------------------------
 
+ insert into cliente (nombre,apellido,correo,id_direccion,fecha_registro,estado,id_tienda)
+ select distinct
+      (select A[1] from REGEXP_SPLIT_TO_ARRAY(NOMBRE_CLIENTE, ' ') AS DT(A)) AS nombre ,
+      (SELECT A[2] FROM REGEXP_SPLIT_TO_ARRAY(NOMBRE_CLIENTE, ' ') AS DT(A)) AS apellido,
+      CORREO_CLIENTE,
+      direccion.id_direccion,
+      cast(FECHA_CREACION as date),
+      CLIENTE_ACTIVO,
+      tienda.id_tienda
+      from temporal
+      inner join direccion on temporal.direccion_cliente= direccion.direccion
+      inner join tienda on temporal.tienda_preferida = tienda.nombre
+      where nombre_cliente <> '-' and CORREO_CLIENTE <> '-' and CLIENTE_ACTIVO <> '-';
+
+     select * from cliente;
+      select distinct nombre, apellido from cliente c ;
+
+    delete from cliente ;
+     ALTER SEQUENCE Cliente_id_cliente_seq   RESTART WITH 1;
+
+    SELECT concat( nombre, ' ',apellido ) , COUNT(concat( nombre, ' ',apellido ))
+FROM cliente
+GROUP BY concat( nombre, ' ',apellido )
+HAVING COUNT(concat( nombre, ' ',apellido ))>1
+
+--Mattie Hoffman
+  --    Cecil Vines estan repetidos por alguna razon xd en total son 599 clientes :D podria eliminar los repeated clientes?
+
+
+ select distinct nombre_Cliente from temporal t ;
+
+
+ ---------------TABLA RENTA----------------------------
+
+
+insert into renta (monto,fecha_pago,id_empleado,fecha_renta,fecha_devolucion,id_cliente,id_pelicula)
+select distinct cast (MONTO_A_PAGAR as decimal(10,2)),
+cast (FECHA_PAGO as date),
+empleado.id_empleado,
+cast(FECHA_RENTA as date),
+cast(FECHA_RETORNO as date),
+cliente.id_cliente,
+pelicula.id_pelicula
+from temporal
+inner join empleado on temporal.nombre_empleado = concat( empleado.nombre, ' ',empleado.apellido )
+inner join cliente on temporal.nombre_cliente = concat( cliente.nombre, ' ',cliente.apellido )
+inner join pelicula on temporal.nombre_pelicula =pelicula.titulo
+where nombre_empleado <> '-' and nombre_cliente <> '-' and nombre_pelicula <> '-' and FECHA_RENTA <> '-' and FECHA_RETORNO <> '-' and MONTO_A_PAGAR <> '-'
+and FECHA_PAGO <> '-';
+
+select * from renta ;
+select count(*) from renta ;
+
+    delete from renta ;
+     ALTER SEQUENCE Renta_id_renta_seq   RESTART WITH 1;
+
+
+SELECT
+    monto,fecha_pago,fecha_renta,fecha_devolucion COUNT (monto,fecha_pago,fecha_renta,fecha_devolucion)
+FROM
+    renta
+GROUP BY
+    monto,fecha_pago,fecha_renta,fecha_devolucion
+HAVING
+    COUNT(*) > 1;
+
+
+-------------------------------------
 
 
 
@@ -377,6 +445,16 @@ select distinct
 
 
 
+
+
+
+
+
+ --CONSULTA 1------
+SELECT count(titulo)
+FROM inventario
+inner join pelicula  on pelicula.id_pelicula=inventario.id_pelicula
+WHERE titulo = 'SUGAR WONKA';
 
 
 

@@ -82,7 +82,7 @@ select distinct PAIS_CLIENTE from temporal where PAIS_CLIENTE <> '-';
   SELECT  distinct PAIS_EMPLEADO from temporal where PAIS_EMPLEADO <> '-'
   union
    SELECT  distinct PAIS_TIENDA from temporal where PAIS_TIENDA <> '-' ;
-
+  select * from pais p ;
   ALTER SEQUENCE Pais_id_pais_seq   RESTART WITH 1;
   truncate table pais cascade;
 
@@ -129,8 +129,10 @@ IS NOT
     NULL;
 
 
+   select * from ciudad ;
  truncate table ciudad cascade;
 ALTER SEQUENCE Ciudad_id_ciudad_seq   RESTART WITH 1;
+select nombre from ciudad where nombre ='Lethbridge';
 -------------------------------------------
 
 
@@ -165,11 +167,34 @@ from temporal
 inner join ciudad ON temporal.ciudad_cliente =ciudad.nombre
 where CODIGO_POSTAL_TIENDA <> '-';
 
+
+insert into direccion (id_ciudad, direccion)
+select distinct ciudad.id_ciudad,
+DIRECCION_TIENDA
+from temporal
+inner join ciudad  on temporal.ciudad_tienda =ciudad.nombre
+where nombre_tienda <> '-';
+
+
+insert into direccion (id_ciudad, direccion)
+select distinct ciudad.id_ciudad,
+DIRECCION_EMPLEADO
+from temporal
+inner join ciudad  on temporal.ciudad_empleado =ciudad.nombre
+where nombre_empleado <> '-';
+
+
+
+
+
+
+--como hago para que tambien me tome las idrecciones sin codigo postal?
+
+
+
+
 select * from direccion d ;
 
-
- truncate table ciudad cascade;
-ALTER SEQUENCE Ciudad_id_ciudad_seq   RESTART WITH 1;
 
 DELETE FROM direccion ;
 
@@ -179,6 +204,8 @@ ALTER TABLE direccion
 ADD direccion varchar;
 
 ALTER SEQUENCE Direccion_id_direccion_seq   RESTART WITH 1;
+
+select * from direccion ;
 
 
 
@@ -243,14 +270,18 @@ DELETE FROM pelicula;
 
 -----CATEGORIA PELICULA------
 
-insert into categoriapelicula (id_pelicula,id_categoria)
-select distinct pelicula.id_pelicula , categoria.id_categoria
-from pelicula
-inner join pelicula on pelicula.id_pelicula=pelicula.id_pelicula
-inner join categoria on categoria.id_categoria =categoria.id_categoria ;
 
 
+insert into categoriapelicula(id_categoria,id_pelicula)
+select distinct cat.id_categoria ,
+p.id_pelicula from temporal t
+inner join categoria cat
+	on cat.categoria  = t.categoria_pelicul
+inner join pelicula p
+	on p.titulo = t.nombre_pelicula;
 
+
+select * from categoriapelicula c ;
 --------------TRADUCCION----------------------
 
 insert into traduccion (traduccion,id_pelicula)
@@ -260,7 +291,172 @@ inner join pelicula on temporal.lenguaje_pelicula =pelicula.idioma
 where LENGUAJE_PELICULA <> '-';
 
 
----------------------------
+-------------ACTORPELICULA--------------
+
+insert into actorpelicula (id_actor,id_pelicula)
+select distinct cat.id_actor,
+p.id_pelicula from temporal t
+inner join actor cat
+	on concat( cat.nombre, ' ',cat.apellido )= t.actor_pelicula
+inner join pelicula p
+	on p.titulo = t.nombre_pelicula;
+
+
+--------------TIENDA------------------------
+
+insert into tienda (id_direccion, nombre)
+select distinct d.id_direccion, NOMBRE_TIENDA
+from temporal
+inner join direccion d on temporal.direccion_tienda= d.direccion
+where NOMBRE_TIENDA <> '-';
+
+select * from tienda;
+
+
+select * from direccion d ;
+
+
+-------------INVENTARIO--------------------
+
+insert into inventario (id_tienda,id_pelicula)
+select distinct cat.id_tienda ,
+p.id_pelicula from temporal t
+inner join tienda cat
+	on cat.nombre  = t.nombre_tienda
+inner join pelicula p
+	on p.titulo = t.nombre_pelicula;
+
+
+--***********************
+
+select * from inventario i ;
+
+delete from inventario ;
+
+ALTER SEQUENCE inventario_id_pelicula_seq   RESTART WITH 1;
+select * from  pelicula p ;
+
+select id_pelicula ,titulo from pelicula where titulo ='SUGAR WONKA';
+
+--860 no esta en tienda 2
+--910 TREATMENT JEKYLL
+
+-------------TABLA EMPLEADO-------
+
+
+insert into empleado (nombre,apellido,id_direccion,correo,estado,username,ppassword,id_tienda)
+select distinct
+    (select A[1] from REGEXP_SPLIT_TO_ARRAY(NOMBRE_EMPLEADO, ' ') AS DT(A)) AS nombre ,
+    (SELECT A[2] FROM REGEXP_SPLIT_TO_ARRAY(NOMBRE_EMPLEADO, ' ') AS DT(A)) AS apellido,
+    direccion.id_direccion ,
+    CORREO_EMPLEADO,
+    EMPLEADO_ACTIVO,
+    USUARIO_EMPLEADO,
+    PASSWORD_EMPLEADO,
+    tienda.id_tienda
+    from temporal
+    inner join direccion on temporal.direccion_empleado =direccion.direccion
+    inner join tienda on temporal.tienda_empleado = tienda.nombre
+    where nombre_empleado <> '-';
+
+   select * from empleado;
+
+  delete from empleado ;
+
+
+  ALTER SEQUENCE Direccion_id_direccion_seq   RESTART WITH 1;
+
+---------------------TABLA PUESTO------------------------------------
+
+----------------TABLA CLIENTE------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+select dist, cod_postal,id_ciudad from(
+select distinct direccion_empleado as dist, codigo_postal_empleado as cod_postal , id_ciudad from temporal
+    inner join ciudad
+    on ciudad_empleado = nombre)X
+where dist <> '-' and cod_postal <> '-';
+
+
+select dist, cod_postal,id_ciudad from(
+select distinct direccion_tienda as dist, CODIGO_POSTAL_TIENDA as cod_postal , id_ciudad from temporal
+    inner join ciudad
+    on ciudad_tienda = nombre)X
+where dist <> '-' and cod_postal <> '-';
+
+
+select  direccion_tienda from temporal ;
+select  distinct direccion_tienda from temporal  where nombre_tienda  <> '-';
+
+
+
+select * from temporal t ;
+
+
+
+select  distinct temporal.direccion_empleado from temporal where nombre_empleado <> '-';
+
+
+--NO tomemo en cuenta el codigo postal de la tienda alv thats the fucking KEY
+
+select distinct temporal.direccion_tienda from temporal where nombre_tienda <> '-';
+
+select distinct temporal.codigo_postal_empleado from temporal where codigo_postal_empleado <> '-' and nombre_empleado <>'-';
+
+select distinct temporal.direccion_cliente from temporal where codigo_postal_cliente <> '-' and nombre_cliente <>'-';
+select distinct temporal.direccion_empleado from temporal where nombre_empleado <>'-';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

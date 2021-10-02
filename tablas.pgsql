@@ -149,5 +149,5 @@ foreign key (id_pelicula) references Pelicula(id_pelicula)
 
 
 
-
+#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
 

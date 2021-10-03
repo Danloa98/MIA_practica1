@@ -68,3 +68,39 @@ order by
 
 
 
+---------------CONSULTA 4------------------------------
+
+select distinct
+    actor.nombre as nombre,
+    actor.apellido as apellido,
+    pelicula.anio_lanzamiento,
+    pelicula.titulo
+from
+    actor,
+    pelicula,
+    actorpelicula
+where
+    actorpelicula.id_pelicula=pelicula.id_pelicula and
+    lower(pelicula.descripcion) like '%crocodile%' and
+    lower(pelicula.descripcion) like '%shark%' and
+    actor.id_actor =actorpelicula.id_actor
+
+group by
+    actor.nombre,
+    actor.apellido,
+    pelicula.anio_lanzamiento,
+    pelicula.titulo
+order by
+    actor.apellido asc
+
+;
+
+
+select * from actor ;
+
+
+
+
+
+
+

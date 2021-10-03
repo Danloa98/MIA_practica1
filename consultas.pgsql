@@ -42,8 +42,29 @@ HAVING
 SELECT renta.id_cliente
 FROM renta
 inner join cliente on cliente.id_cliente =renta.id_cliente
-WHERE concat(nombre,' ', apellido ) = 'Mattie Hoffman';
+WHERE concat(nombre,' ', apellido ) = 'Tammy Sanders';
 
 ---id 91 y 92
 
 ---id 404 y  403 para mattie hoffman
+
+
+
+
+
+---------------CONSULTA 3----------------------
+
+select
+    concat( actor.nombre, ' ' ,actor.apellido) as Actor
+from
+    actor
+where
+    actor.apellido like '%son%'
+group by
+    actor.nombre, actor.apellido
+order by
+    actor.nombre
+;
+
+
+

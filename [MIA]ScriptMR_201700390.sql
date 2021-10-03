@@ -148,6 +148,20 @@ foreign key (id_pelicula) references Pelicula(id_pelicula)
 
 
 
-
-#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
+drop table renta;
+drop table cliente;
+drop table puesto;
+drop table empleado;
+drop table inventario;
+drop table tienda;
+drop table direccion;
+drop table ciudad;
+drop table pais;
+drop table actorpelicula;
+drop table actor;
+drop table categoriapelicula;
+drop table categoria;
+drop table traduccion;
+drop table pelicula;
+drop table clasificacion;
 

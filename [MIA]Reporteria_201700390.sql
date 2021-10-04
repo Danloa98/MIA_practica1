@@ -12,9 +12,6 @@ WHERE titulo = 'SUGAR WONKA';
 
 ---CONSULTA 2------
 
-
-
----------consulta como tal----------------
 select distinct renta.id_cliente ,
     cliente.nombre, cliente.apellido,
     Sum(renta.monto)as total,
@@ -331,6 +328,39 @@ t.ciudad,
 t.rentadas;
 
 
+------------CONSULTA 10------------------------------
+
+
+
+select pais,ciudad,categoria,rentadas from (
+select pais, ciudad, categoria, rentadas, row_number() over(partition by pais, ciudad order by rentadas desc) rank from(
+select
+  pais.nombre pais,
+  ciudad.nombre ciudad,
+  categoria.categoria,
+  COUNT(renta.id_cliente) AS rentadas
+FROM
+  renta
+inner join cliente
+	on cliente.id_cliente = renta.id_cliente
+inner join direccion
+	on direccion.id_direccion = cliente.id_direccion
+inner join ciudad
+	on ciudad.id_ciudad = direccion.id_ciudad
+inner join pais
+	on pais.id_pais = ciudad.id_pais
+inner join pelicula
+	on pelicula.id_pelicula = renta.id_pelicula
+inner join categoriapelicula
+	on categoriapelicula.id_pelicula = pelicula.id_pelicula
+inner join categoria
+	on categoria.id_categoria = categoriapelicula.id_categoria
+group by ciudad.nombre,
+pais.nombre,
+categoria.categoria
+)x
+)t2
+where rank = 1 and upper(categoria) = 'HORROR';
 
 
 

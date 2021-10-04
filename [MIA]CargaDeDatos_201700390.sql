@@ -1,4 +1,4 @@
----------LLENAR TABLA PAIS
+---------LLENAR TABLA PAIS------
 
   INSERT INTO pais (nombre)
   select distinct PAIS_CLIENTE FROM temporal where PAIS_CLIENTE <> '-'

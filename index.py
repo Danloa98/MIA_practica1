@@ -928,6 +928,64 @@ t.rentadas;
 
 
 
+
+
+
+
+
+
+
+@app.route('/consulta10', methods=['GET'])
+def consulta10():
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("""
+    
+    select pais,ciudad,categoria,rentadas from (
+select pais, ciudad, categoria, rentadas, row_number() over(partition by pais, ciudad order by rentadas desc) rank from(
+select
+  pais.nombre pais,
+  ciudad.nombre ciudad,
+  categoria.categoria,
+  COUNT(renta.id_cliente) AS rentadas
+FROM
+  renta 
+inner join cliente
+	on cliente.id_cliente = renta.id_cliente
+inner join direccion
+	on direccion.id_direccion = cliente.id_direccion
+inner join ciudad
+	on ciudad.id_ciudad = direccion.id_ciudad
+inner join pais
+	on pais.id_pais = ciudad.id_pais
+inner join pelicula 
+	on pelicula.id_pelicula = renta.id_pelicula 
+inner join categoriapelicula
+	on categoriapelicula.id_pelicula = pelicula.id_pelicula 
+inner join categoria
+	on categoria.id_categoria = categoriapelicula.id_categoria
+group by ciudad.nombre,
+pais.nombre,
+categoria.categoria 
+)x
+)t2 
+where rank = 1 and upper(categoria) = 'HORROR';
+    
+    
+    """)
+    rows = cur.fetchall()
+    result = jsonify(rows)
+    con.commit()
+    cur.close()
+    return result
+
+
+
+
+
+
+
+
 if __name__=='__main__':
     app.run(debug=True)
 

@@ -813,6 +813,64 @@ T.ciudad;
     return result
 
 
+@app.route('/consulta8', methods=['GET'])
+def consulta8():
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("""
+
+select t.pais,
+t.rentadas,
+(t.rentadas*100)/(select distinct 
+  cast(COUNT(renta.id_cliente) as float)AS rentadas
+FROM
+  renta 
+inner join cliente
+	on cliente.id_cliente = renta.id_cliente
+inner join direccion
+	on direccion.id_direccion = cliente.id_direccion
+inner join ciudad
+	on ciudad.id_ciudad = direccion.id_ciudad
+inner join pais
+	on pais.id_pais = ciudad.id_pais
+where pais.nombre = t.pais
+group by pais.nombre) porcentaje from( 
+	select
+	  pais.nombre pais,
+	  COUNT(renta.id_cliente) AS rentadas
+	FROM
+	  renta 
+	inner join cliente
+		on cliente.id_cliente = renta.id_cliente
+	inner join direccion
+		on direccion.id_direccion = cliente.id_direccion
+	inner join ciudad
+		on ciudad.id_ciudad = direccion.id_ciudad
+	inner join pais
+		on pais.id_pais = ciudad.id_pais
+	inner join pelicula
+		on pelicula.id_pelicula = renta.id_pelicula 
+	inner join categoriapelicula
+		on categoriapelicula.id_pelicula =pelicula.id_pelicula 
+	inner join categoria 
+		on categoria.id_categoria = categoriapelicula.id_categoria 
+	where lower(categoria.categoria) = 'sports'
+	group by pais.nombre)t
+group by t.pais,
+t.rentadas;
+
+
+    """)
+    rows = cur.fetchall()
+    result = json.jsonify(rows)
+    con.commit()
+    cur.close()
+    return result
+
+
+
+
+
 
 
 @app.route('/consulta9', methods=['GET'])
@@ -867,6 +925,7 @@ t.rentadas;
     con.commit()
     cur.close()
     return result
+
 
 
 if __name__=='__main__':

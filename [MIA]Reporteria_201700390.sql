@@ -240,7 +240,50 @@ T.ciudad;
 
 
 
-------------CONSULTA 8---------------------
+
+------consulta 8------------
+
+
+select t.pais,
+t.rentadas,
+(t.rentadas*100)/(select distinct
+  cast(COUNT(renta.id_cliente) as float)AS rentadas
+FROM
+  renta
+inner join cliente
+	on cliente.id_cliente = renta.id_cliente
+inner join direccion
+	on direccion.id_direccion = cliente.id_direccion
+inner join ciudad
+	on ciudad.id_ciudad = direccion.id_ciudad
+inner join pais
+	on pais.id_pais = ciudad.id_pais
+where pais.nombre = t.pais
+group by pais.nombre) porcentaje from(
+	select
+	  pais.nombre pais,
+	  COUNT(renta.id_cliente) AS rentadas
+	FROM
+	  renta
+	inner join cliente
+		on cliente.id_cliente = renta.id_cliente
+	inner join direccion
+		on direccion.id_direccion = cliente.id_direccion
+	inner join ciudad
+		on ciudad.id_ciudad = direccion.id_ciudad
+	inner join pais
+		on pais.id_pais = ciudad.id_pais
+	inner join pelicula
+		on pelicula.id_pelicula = renta.id_pelicula
+	inner join categoriapelicula
+		on categoriapelicula.id_pelicula =pelicula.id_pelicula
+	inner join categoria
+		on categoria.id_categoria = categoriapelicula.id_categoria
+	where lower(categoria.categoria) = 'sports'
+	group by pais.nombre)t
+group by t.pais,
+t.rentadas;
+
 
 
 
